@@ -6,14 +6,16 @@ namespace Sensor.Services
     public class VideoCaptureService
     {
         private VideoCapture _videoCapture;
-
+        private int _frameRate;
         public event EventHandler<FrameEventArgs> OnNewFrame;
 
-        public VideoCaptureService()
+        public VideoCaptureService(int frameRate = 30)
         {
-            _videoCapture = new VideoCapture(0); // Open the first camera
+            _videoCapture = new VideoCapture(0);
             if (!_videoCapture.IsOpened())
                 throw new Exception("Cannot open the camera");
+
+            _frameRate = frameRate;
         }
 
         public void Start()
@@ -28,6 +30,8 @@ namespace Sensor.Services
                     {
                         OnNewFrame?.Invoke(this, new FrameEventArgs { Frame = frame });
                     }
+
+                    Task.Delay(1000 / _frameRate).Wait();
                 }
             });
         }
