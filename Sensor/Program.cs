@@ -20,7 +20,7 @@ namespace CompressionApp.Client
 
             videoCaptureService.OnNewFrame += async (s, e) =>
             {
-                var frame = e.Frame.Clone();
+                var frame = videoCaptureService.CropToSquare(e.Frame.Clone());
                 var timestamp = DateTime.Now;
 
                 frameBufferQueue.Enqueue((frame, timestamp));
@@ -34,10 +34,11 @@ namespace CompressionApp.Client
                     await semaphoreSlim.WaitAsync();
                     try
                     {
-                        _ = Task.Run(() => transmissionService.SendDetectedObject(frame, detectedObject));
+                        transmissionService.SendDetectedObject(frame, detectedObject);
+                        //_ = Task.Run(() => transmissionService.SendDetectedObject(frame, detectedObject));
 
-                        ConcurrentQueue<Mat> videoFragment = GetVideoFragment(timestamp);
-                        _ = Task.Run(() => transmissionService.SendVideoFragment(videoFragment));
+                        //ConcurrentQueue<Mat> videoFragment = GetVideoFragment(timestamp);
+                        //_ = Task.Run(() => transmissionService.SendVideoFragment(videoFragment));
                     }
                     finally
                     {

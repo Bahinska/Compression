@@ -19,11 +19,11 @@ namespace Sensor.Services
 
             using var content = new MultipartFormDataContent
             {
-                { objectContent, "metadata" },
+                { objectContent, "detectedObject" },
                 { new ByteArrayContent(compressedFrame), "frame", "compressedFrame.dct" }
             };
 
-            var response = await httpClient.PostAsync("http://localhost:5000/api/detection", content);
+            var response = await httpClient.PostAsync("https://localhost:7246/api/decompress-photo", content);
             Console.WriteLine($"Detection and frame send response: {response.StatusCode}");
         }
 
@@ -55,7 +55,7 @@ namespace Sensor.Services
                     { new StreamContent(compressedVideoStream), "video", "video_fragment_compressed.dct" }
                 };
 
-                var response = await httpClient.PostAsync("http://localhost:5000/api/compressed-video", content);
+                var response = await httpClient.PostAsync("https://localhost:7246/api/compressed-video", content);
 
                 if (response.IsSuccessStatusCode)
                 {

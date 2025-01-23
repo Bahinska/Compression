@@ -5,7 +5,7 @@ VisualStudioVersion = 17.8.34309.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sensor", "..\Sensor\Sensor.csproj", "{516B3E7F-8246-4884-8048-C97DE35C94D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompressAPI", "..\CompressAPI\CompressAPI.csproj", "{0B75BE3E-72E9-4820-A4BA-7FCA478397BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerAPI", "..\CompressAPI\ServerAPI.csproj", "{0B75BE3E-72E9-4820-A4BA-7FCA478397BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

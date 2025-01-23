@@ -1,5 +1,4 @@
 ﻿using OpenCvSharp;
-using System;
 
 namespace Sensor.Services
 {
@@ -16,6 +15,7 @@ namespace Sensor.Services
 
                 // Apply 2D Discrete Cosine Transform (DCT)
                 Accord.Math.CosineTransform.DCT(matrix);
+
 
                 return MatrixToByteArray(matrix);
             }

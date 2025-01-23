@@ -1,7 +1,5 @@
 ﻿using OpenCvSharp;
 using Sensor.Services.Interfaces;
-using System;
-using System.Collections.Generic;
 
 namespace Sensor.Services
 {

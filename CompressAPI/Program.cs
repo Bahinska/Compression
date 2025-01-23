@@ -1,5 +1,5 @@
 
-using Server.Services;
+using ServerAPI.Services;
 
 namespace CompressAPI
 {
@@ -13,7 +13,7 @@ namespace CompressAPI
 
             builder.Services.AddControllers();
 
-            builder.Services.AddSingleton<CompressionService>();
+            builder.Services.AddSingleton<DCTDecompressionService>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

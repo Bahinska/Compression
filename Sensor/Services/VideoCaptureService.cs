@@ -40,5 +40,21 @@ namespace Sensor.Services
         {
             _videoCapture.Release();
         }
+
+        public Mat CropToSquare(Mat frame)
+        {
+            int width = frame.Width;
+            int height = frame.Height;
+
+            int squareSize = Math.Min(width, height);
+
+            int xStart = (width - squareSize) / 2;
+            int yStart = (height - squareSize) / 2;
+
+            var roi = new Rect(xStart, yStart, squareSize, squareSize);
+
+            return new Mat(frame, roi);
+        }
+
     }
 }
