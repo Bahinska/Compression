@@ -1,112 +1,79 @@
-﻿using OpenCvSharp;
+﻿using Microsoft.Extensions.Configuration;
+using OpenCvSharp;
 using Sensor.Services;
-using Sensor.Services.Interfaces;
-using System.Collections.Concurrent;
-
 
 namespace CompressionApp.Client
 {
     class Program
     {
-        static readonly ConcurrentQueue<(Mat frame, DateTime timestamp)> frameBufferQueue = new ConcurrentQueue<(Mat frame, DateTime timestamp)>();
-        static readonly TimeSpan BufferTimeSpan = TimeSpan.FromSeconds(10);
-        static readonly SemaphoreSlim semaphoreSlim = new (1, 1);
+        static readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+        static readonly object frameProcessingLock = new object();
+        static bool isProcessing = false;
 
         static async Task Main(string[] args)
         {
             var videoCaptureService = new VideoCaptureService();
             var transmissionService = new TransmissionService();
             var analyzerService = new OpenCVAnalyzerService();
+            var webSocketClient = new WebSocketClient(new Uri("ws://localhost:5039/ws/client"));
+
+            //await webSocketClient.ConnectAsync();
 
             videoCaptureService.OnNewFrame += async (s, e) =>
             {
-                var frame = videoCaptureService.CropToSquare(e.Frame.Clone());
-                var timestamp = DateTime.Now;
+                await webSocketClient.SendFrameAsync(e.Frame);
 
-                frameBufferQueue.Enqueue((frame, timestamp));
-                RemoveOldFrames(timestamp);
-
-                if (analyzerService.AnalyzeFrame(frame, out string detectedObject))
+                if (analyzerService.AnalyzeFrame(e.Frame, out string detectedObject))
                 {
-                    Console.WriteLine("Object detected");
-                    analyzerService.DisplayObjectRectangle(frame);
+                    //analyzerService.DisplayObjectRectangle(e.Frame);
 
-                    await semaphoreSlim.WaitAsync();
-                    try
+                    // Ensure only one processing task runs at a time
+                    lock (frameProcessingLock)
                     {
-                        transmissionService.SendDetectedObject(frame, detectedObject);
-                        //_ = Task.Run(() => transmissionService.SendDetectedObject(frame, detectedObject));
+                        if (isProcessing)
+                        {
+                            return;
+                        }
 
-                        //ConcurrentQueue<Mat> videoFragment = GetVideoFragment(timestamp);
-                        //_ = Task.Run(() => transmissionService.SendVideoFragment(videoFragment));
+                        isProcessing = true;
                     }
-                    finally
+
+                    //await ProcessDetectionAsync(e.Frame, detectedObject, transmissionService);
+
+                    lock (frameProcessingLock)
                     {
-                        semaphoreSlim.Release();
+                        isProcessing = false;
                     }
                 }
 
-                Cv2.ImShow("Sensor Video Stream", frame);
+                Cv2.ImShow("Sensor Video Stream", e.Frame);
                 Cv2.WaitKey(1);
 
                 e.Frame.Dispose();
             };
-
+            
             videoCaptureService.Start();
 
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
 
             videoCaptureService.Stop();
+            await webSocketClient.DisconnectAsync();
             Cv2.DestroyAllWindows();
-
-            ClearAllFrames();
         }
 
-        static void RemoveOldFrames(DateTime currentTimestamp)
+        static async Task ProcessDetectionAsync(Mat frame, string detectedObject, TransmissionService transmissionService)
         {
-            while (!frameBufferQueue.IsEmpty)
+            await semaphoreSlim.WaitAsync();
+            var squareFrame = VideoCaptureService.CropToSquare(frame.Clone());
+            try
             {
-                if (frameBufferQueue.TryPeek(out var oldestFrame) && currentTimestamp - oldestFrame.timestamp > BufferTimeSpan)
-                {
-                    if (frameBufferQueue.TryDequeue(out var oldFrame))
-                    {
-                        oldFrame.frame.Dispose();
-                    }
-                }
-                else
-                {
-                    break;
-                }
+                await transmissionService.SendDetectedObjectAsync(frame, detectedObject);
             }
-        }
-
-        static ConcurrentQueue<Mat> GetVideoFragment(DateTime detectionTime)
-        {
-            var fragment = new ConcurrentQueue<Mat>();
-            var startTimestamp = detectionTime.AddSeconds(-5);
-            var endTimestamp = detectionTime.AddSeconds(5);
-
-            // Adding frames in the range [detectionTime - 5s, detectionTime + 5s]
-            foreach (var (frame, timestamp) in frameBufferQueue)
+            finally
             {
-                if (timestamp >= startTimestamp && timestamp <= endTimestamp)
-                {
-                    fragment.Enqueue(frame.Clone());
-                }
-            }
-
-            return fragment;
-        }
-
-        static void ClearAllFrames()
-        {
-            while (!frameBufferQueue.IsEmpty)
-            {
-                if (frameBufferQueue.TryDequeue(out var oldFrame))
-                {
-                    oldFrame.frame.Dispose();
-                }
+                squareFrame.Dispose();
+                semaphoreSlim.Release();
             }
         }
     }

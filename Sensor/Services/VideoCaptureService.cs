@@ -41,7 +41,7 @@ namespace Sensor.Services
             _videoCapture.Release();
         }
 
-        public Mat CropToSquare(Mat frame)
+        public static Mat CropToSquare(Mat frame)
         {
             int width = frame.Width;
             int height = frame.Height;

@@ -13,6 +13,7 @@
     <PackageReference Include="Accord.Math" Version="3.8.0" />
     <PackageReference Include="Accord.Video" Version="3.8.0" />
     <PackageReference Include="Accord.Video.DirectShow" Version="3.8.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.3.0" />
     <PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.10.0.20241108" />
     <PackageReference Include="OpenCvSharp4.Windows" Version="4.10.0.20241108" />
