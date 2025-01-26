@@ -1,28 +1,37 @@
-﻿using OpenCvSharp;
+﻿using Grpc.Net.Client;
+using OpenCvSharp;
+using Sensor.Protos;
 
 namespace Sensor.Services
 {
     public class TransmissionService
     {
-        private readonly HttpClient httpClient = new HttpClient();
+        private readonly DetectionService.DetectionServiceClient _grpcClient;
 
+        public TransmissionService()
+        {
+            var channel = GrpcChannel.ForAddress("https://localhost:7246"); //grpc server address
+            _grpcClient = new DetectionService.DetectionServiceClient(channel);
+        }
         public async Task SendDetectedObjectAsync(Mat frame, string detectedObject)
         {
             var compressedFrame = DCTCompressionService.Compress(frame);
 
-            var objectContent = new StringContent(
-                $"{{\"detectedObject\":\"{detectedObject}\"}}",
-                System.Text.Encoding.UTF8,
-                "application/json");
-
-            using var content = new MultipartFormDataContent
+            var request = new DetectionRequest
             {
-                { objectContent, "detectedObject" },
-                { new ByteArrayContent(compressedFrame), "frame", "compressedFrame.dct" }
+                DetectedObject = detectedObject,
+                Frame = Google.Protobuf.ByteString.CopyFrom(compressedFrame)
             };
 
-            var response = await httpClient.PostAsync("https://localhost:7246/api/detection", content);
-            Console.WriteLine($"Detection and frame send response: {response.StatusCode}");
+            try
+            {
+                var response = await _grpcClient.SendDetectedObjectAsync(request);
+                Console.WriteLine(response.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending detected object via gRPC: {ex.Message}");
+            }
         }
     }
 }

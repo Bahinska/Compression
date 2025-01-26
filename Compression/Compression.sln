@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sensor", "..\Sensor\Sensor.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerAPI", "..\CompressAPI\ServerAPI.csproj", "{0B75BE3E-72E9-4820-A4BA-7FCA478397BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensorClient", "Client\SensorClient.csproj", "{DB78437E-DEFD-4A59-A677-EB114EFC640E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SensorClient", "Client\SensorClient.csproj", "{DB78437E-DEFD-4A59-A677-EB114EFC640E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

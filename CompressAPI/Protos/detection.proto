@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option csharp_namespace = "SensorApi.Protos";
+
+service DetectionService {
+  rpc SendDetectedObject (DetectionRequest) returns (DetectionResponse);
+}
+
+message DetectionRequest {
+  string detected_object = 1;
+  bytes frame = 2;
+}
+
+message DetectionResponse {
+  string message = 1;
+}

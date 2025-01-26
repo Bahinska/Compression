@@ -1,5 +1,3 @@
-
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.WebSockets;
 using ServerAPI.Services;
 
@@ -34,6 +32,7 @@ namespace CompressAPI
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddGrpc();
 
             var app = builder.Build();
 
@@ -44,6 +43,8 @@ namespace CompressAPI
                 app.UseSwaggerUI();
             }
             app.UseCors("CorsPolicy");
+
+            app.MapGrpcService<DetectionGrpcService>();
 
             app.UseHttpsRedirection();
 
