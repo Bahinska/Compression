@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Net.Http;
 using System.Net.WebSockets;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,39 +11,47 @@ namespace Sensor.Services
 {
     public class WebSocketClient
     {
+        private readonly HttpClient httpClient = new HttpClient();
         private readonly ClientWebSocket _clientWebSocket;
         private readonly Uri _serverUri;
+        private readonly Uri _clientHealthUri;
         private bool _isStreaming;
         private bool _isConnected;
+        private static object syncObject = new();
 
-        public WebSocketClient(Uri serverUri)
+
+        public WebSocketClient(Uri serverUri, Uri healthUri)
         {
             _clientWebSocket = new ClientWebSocket();
             _serverUri = serverUri;
+            _clientHealthUri = healthUri;
             _isStreaming = false;
             _isConnected = false;
 
-            _clientWebSocket.ConnectAsync(_serverUri, CancellationToken.None);
-            _isConnected = true;
-            _isStreaming = true;
-            Console.WriteLine("Connected to WebSocket server.");
-            //ReceiveMessagesAsync();
         }
 
-        //public async Task ConnectAsync()
-        //{
-        //    if (!_isConnected)
-        //    {
-        //        await _clientWebSocket.ConnectAsync(_serverUri, CancellationToken.None);
-        //        _isConnected = true;
-        //        _isStreaming = true;
-        //        Console.WriteLine("Connected to WebSocket server.");
-        //        await ReceiveMessagesAsync();
-        //    }
-        //}
+        public async Task ConnectAsync()
+        {
+            if (!_isConnected && await ClientHealthy())
+            {
+                await _clientWebSocket.ConnectAsync(_serverUri, CancellationToken.None);
+                _isConnected = true;
+                _isStreaming = true;
+                Console.WriteLine("Connected to WebSocket server.");
+                await ReceiveMessagesAsync();
+            }
+        }
 
         public async Task SendFrameAsync(Mat frame)
         {
+            if (!_isConnected)
+            {
+                lock (syncObject)
+                {
+                    ConnectAsync();
+                }
+            }
+
             if (_isStreaming)
             {
                 var image = frame.ToBytes(".png");
@@ -87,6 +97,19 @@ namespace Sensor.Services
                 _isStreaming = false;
                 await _clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
                 _isConnected = false;
+            }
+        }
+
+        public async Task<bool> ClientHealthy()
+        {
+            try
+            {
+                var response = await httpClient.GetAsync(_clientHealthUri);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception e)
+            {
+                return false;
             }
         }
     }

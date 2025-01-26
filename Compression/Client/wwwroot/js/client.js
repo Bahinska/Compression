@@ -38,6 +38,7 @@
             };
 
             socket.onclose = function (event) {
+                img.src = new Image();
                 console.log("Disconnected from WebSocket server.");
             };
 

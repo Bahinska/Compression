@@ -40,7 +40,6 @@ public class WebSocketHandler
             var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             //await socket.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length), WebSocketMessageType.Binary, true, CancellationToken.None);
             messageHandler(result, buffer);
-            await Task.Delay(100);
             await Broadcast(buffer);
         }
     }

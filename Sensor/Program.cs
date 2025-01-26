@@ -15,9 +15,9 @@ namespace CompressionApp.Client
             var videoCaptureService = new VideoCaptureService();
             var transmissionService = new TransmissionService();
             var analyzerService = new OpenCVAnalyzerService();
-            var webSocketClient = new WebSocketClient(new Uri("ws://localhost:5039/ws/client"));
+            var webSocketClient = new WebSocketClient(new Uri("ws://localhost:5039/ws/client"), new Uri("http://localhost:5039/api/health"));
 
-            //await webSocketClient.ConnectAsync();
+            Task.Run(async () => await webSocketClient.ConnectAsync());
 
             videoCaptureService.OnNewFrame += async (s, e) =>
             {
@@ -25,7 +25,7 @@ namespace CompressionApp.Client
 
                 if (analyzerService.AnalyzeFrame(e.Frame, out string detectedObject))
                 {
-                    //analyzerService.DisplayObjectRectangle(e.Frame);
+                    analyzerService.DisplayObjectRectangle(e.Frame);
 
                     // Ensure only one processing task runs at a time
                     lock (frameProcessingLock)
