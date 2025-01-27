@@ -5,13 +5,42 @@
     const stopButton = document.getElementById("stopButton");
     let socket;
 
+    async function getJwtToken() {
+        const storedToken = localStorage.getItem('jwtToken');
+        if (storedToken) {
+            return storedToken;
+        }
+
+        // Example request to get a token
+        const response = await fetch('https://localhost:7246/api/account/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                'username': 'test',
+                'password': 'password'
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to retrieve token');
+        }
+
+        const data = await response.json();
+        localStorage.setItem('jwtToken', data.token);
+        return data.token;
+    }
+
     startButton.addEventListener("click", async function () {
         try {
+            const token = await getJwtToken();
+
             const response = await fetch('http://localhost:5039/api/websocket/start', { method: 'POST', credentials: 'include' });
             if (!response.ok) throw new Error('Failed to start streaming');
             console.log(await response.text());
 
-            socket = new WebSocket("ws://localhost:5039/ws/client");
+            socket = new WebSocket(`ws://localhost:5039/ws/client?access_token=${token}`);
             socket.binaryType = "arraybuffer";
 
             socket.onopen = function () {

@@ -19,7 +19,7 @@ namespace CompressionApp.Client
             var analyzerService = new OpenCVAnalyzerService();
             var webSocketClient = new WebSocketClient(new Uri("ws://localhost:5039/ws/client"), new Uri("http://localhost:5039/api/health"));
 
-            Task.Run(async () => await webSocketClient.ConnectAsync());
+             webSocketClient.ConnectAsync();
             Task.Run(BackgroundFrameProcessor);
 
             videoCaptureService.OnNewFrame += async (s, e) =>

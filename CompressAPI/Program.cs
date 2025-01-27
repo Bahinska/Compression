@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.WebSockets;
+using Microsoft.IdentityModel.Tokens;
 using ServerAPI.Services;
+using System.Text;
 
 namespace CompressAPI
 {
@@ -22,6 +25,26 @@ namespace CompressAPI
                         .AllowAnyHeader()
                         .AllowCredentials());
             });
+
+            builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = "Your_Issuer",
+                        ValidAudience = "Your_Audience",
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("Your_Secret_Key_Here")),
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
 
             builder.Services.AddSingleton<DCTDecompressionService>();
             builder.Services.AddWebSockets(options =>
@@ -48,6 +71,7 @@ namespace CompressAPI
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseWebSockets();

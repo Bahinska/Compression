@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.Collections.Concurrent;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.WebSockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 public class WebSocketHandler
 {
@@ -12,23 +11,53 @@ public class WebSocketHandler
 
     public async Task Handle(HttpContext context)
     {
-        if (context.WebSockets.IsWebSocketRequest)
+        if (context.Request.Query.ContainsKey("access_token"))
         {
-            WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
-            _connections.TryAdd(clientSocket, webSocket);
-
-            await Receive(webSocket, async (result, buffer) =>
+            var token = context.Request.Query["access_token"].ToString();
+            var validationParameters = new TokenValidationParameters
             {
-                if (result.MessageType == WebSocketMessageType.Close)
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = "Your_Issuer",
+                ValidAudience = "Your_Audience",
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("this is my custom Secret key for authentication")),
+                ClockSkew = TimeSpan.Zero
+            };
+
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var claimsPrincipal = handler.ValidateToken(token, validationParameters, out _);
+
+                if (context.WebSockets.IsWebSocketRequest)
                 {
-                    _connections.TryRemove(clientSocket, out _);
-                    await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+                    WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                    _connections.TryAdd(clientSocket, webSocket);
+
+                    await Receive(webSocket, async (result, buffer) =>
+                    {
+                        if (result.MessageType == WebSocketMessageType.Close)
+                        {
+                            _connections.TryRemove(clientSocket, out _);
+                            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+                        }
+                    });
                 }
-            });
+                else
+                {
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                }
+            }
+            catch (SecurityTokenException)
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            }
         }
         else
         {
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
         }
     }
 

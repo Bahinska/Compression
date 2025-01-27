@@ -5,6 +5,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using OpenCvSharp;
 
 namespace Sensor.Services
@@ -46,10 +47,9 @@ namespace Sensor.Services
         {
             if (!_isConnected)
             {
-                lock (syncObject)
-                {
-                    ConnectAsync();
-                }
+
+                await ConnectAsync();
+
             }
 
             if (_isStreaming)
