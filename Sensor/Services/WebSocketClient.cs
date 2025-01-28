@@ -31,11 +31,11 @@ namespace Sensor.Services
 
         }
 
-        public async Task ConnectAsync()
+        public async Task ConnectAsync(Uri serverUri)
         {
-            if (!_isConnected && await ClientHealthy())
+            if (!_isConnected)
             {
-                await _clientWebSocket.ConnectAsync(_serverUri, CancellationToken.None);
+                await _clientWebSocket.ConnectAsync(serverUri, CancellationToken.None);
                 _isConnected = true;
                 _isStreaming = true;
                 Console.WriteLine("Connected to WebSocket server.");
@@ -45,13 +45,6 @@ namespace Sensor.Services
 
         public async Task SendFrameAsync(Mat frame)
         {
-            if (!_isConnected)
-            {
-
-                await ConnectAsync();
-
-            }
-
             if (_isStreaming)
             {
                 var image = frame.ToBytes(".png");
@@ -97,19 +90,6 @@ namespace Sensor.Services
                 _isStreaming = false;
                 await _clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
                 _isConnected = false;
-            }
-        }
-
-        public async Task<bool> ClientHealthy()
-        {
-            try
-            {
-                var response = await httpClient.GetAsync(_clientHealthUri);
-                return response.IsSuccessStatusCode;
-            }
-            catch (Exception e)
-            {
-                return false;
             }
         }
     }

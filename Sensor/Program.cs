@@ -27,7 +27,7 @@ namespace CompressionApp.Client
             var analyzerService = host.Services.GetRequiredService<OpenCVAnalyzerService>();
             var webSocketClient = new WebSocketClient(new Uri("ws://localhost:5039/ws/client"), new Uri("http://localhost:5039/api/health"));
 
-             webSocketClient.ConnectAsync();
+             //webSocketClient.ConnectAsync();
             Task.Run(BackgroundFrameProcessor);
 
             videoCaptureService.OnNewFrame += async (s, e) =>
@@ -106,15 +106,6 @@ namespace CompressionApp.Client
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                })
-                .ConfigureServices((context, services) =>
-                {
-                    services.AddSingleton<VideoCaptureService>();
-                    services.AddSingleton<OpenCVAnalyzerService>();
-                    services.AddSingleton(sp => new WebSocketClient(new Uri("ws://localhost:5039/ws/client"), new Uri("http://localhost:5039/api/health")));
-                    services.AddSingleton<TransmissionService>();
-                    services.AddControllers();
-                    services.AddRouting();
                 });
     }
 }
