@@ -1,7 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using OpenCvSharp;
 using Sensor.Services;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
+using SensorConsoleApp;
+using Google.Protobuf.WellKnownTypes;
 
 namespace CompressionApp.Client
 {
@@ -15,8 +20,11 @@ namespace CompressionApp.Client
 
         static async Task Main(string[] args)
         {
-            var videoCaptureService = new VideoCaptureService();
-            var analyzerService = new OpenCVAnalyzerService();
+            var host = CreateHostBuilder(args).Build();
+
+            var videoCaptureService = host.Services.GetRequiredService<VideoCaptureService>();
+            var transmissionService = host.Services.GetRequiredService<TransmissionService>();
+            var analyzerService = host.Services.GetRequiredService<OpenCVAnalyzerService>();
             var webSocketClient = new WebSocketClient(new Uri("ws://localhost:5039/ws/client"), new Uri("http://localhost:5039/api/health"));
 
              webSocketClient.ConnectAsync();
@@ -40,13 +48,32 @@ namespace CompressionApp.Client
             };
             
             videoCaptureService.Start();
+            host.Start();
+            OpenBrowser("http://localhost:5000/api/status");
 
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
 
             videoCaptureService.Stop();
+            await host.WaitForShutdownAsync();
             await webSocketClient.DisconnectAsync();
             Cv2.DestroyAllWindows();
+        }
+        static void OpenBrowser(string url)
+        {
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true
+                };
+                System.Diagnostics.Process.Start(psi);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Could not open browser: {e.Message}");
+            }
         }
 
         static async Task BackgroundFrameProcessor()
@@ -73,5 +100,21 @@ namespace CompressionApp.Client
                 semaphoreSlim.Release();
             }
         }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddSingleton<VideoCaptureService>();
+                    services.AddSingleton<OpenCVAnalyzerService>();
+                    services.AddSingleton(sp => new WebSocketClient(new Uri("ws://localhost:5039/ws/client"), new Uri("http://localhost:5039/api/health")));
+                    services.AddSingleton<TransmissionService>();
+                    services.AddControllers();
+                    services.AddRouting();
+                });
     }
 }
