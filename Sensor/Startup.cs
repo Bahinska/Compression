@@ -22,17 +22,30 @@ namespace SensorConsoleApp
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin",
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:5039") // Allow frontend
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials(); // Important for cookies and authentication
+                    });
+            });
+
             services.AddControllers();
             services.AddSwaggerGen();
 
             // Реєстрація сервісів
             services.AddSingleton<VideoCaptureService>();
             services.AddSingleton<OpenCVAnalyzerService>();
-            services.AddSingleton(sp => new WebSocketClient(new Uri("ws://localhost:5039/ws/client"), new Uri("http://localhost:5039/api/health")));
+            services.AddSingleton<WebSocketClient>();
             services.AddSingleton<TransmissionService>();
 
-            var jwtKey = "Your_Issuer";
-            var jwtIssuer = "Your_Audience";
+            var jwtKey = "aVeryLongSecretKeyThatIsAtLeast32BytesLong";
+            var jwtIssuer = "Your_Issuer";
+            var jwtAudience = "Your_Audience";
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -44,8 +57,8 @@ namespace SensorConsoleApp
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = jwtIssuer,
-                        ValidAudience = jwtIssuer,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("this is my custom Secret key for authentication"))
+                        ValidAudience = jwtAudience,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
                     };
                 });
 
@@ -58,6 +71,7 @@ namespace SensorConsoleApp
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseCors("AllowSpecificOrigin");
 
             app.UseRouting();
 

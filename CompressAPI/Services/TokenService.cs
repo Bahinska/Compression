@@ -7,7 +7,7 @@ namespace ServerAPI.Services
 {
     public class TokenService
     {
-        public static string GenerateJwtToken(string username, string secretKey, string issuer)
+        public static string GenerateJwtToken(string username, string secretKey, string issuer, string audience)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -20,7 +20,7 @@ namespace ServerAPI.Services
 
             var token = new JwtSecurityToken(
                 issuer,
-                issuer,
+                audience,
                 claims,
                 expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: credentials
@@ -28,5 +28,6 @@ namespace ServerAPI.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 }

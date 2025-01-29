@@ -12,19 +12,18 @@ namespace CompressAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
-            builder.Services.AddControllers();
-
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
-                    builder => builder
+                    policy => policy
                         .WithOrigins("http://localhost:5039")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials());
             });
+
+            builder.Services.AddControllers();
+
 
             builder.Services.AddAuthentication(options =>
                 {
@@ -41,7 +40,7 @@ namespace CompressAPI
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = "Your_Issuer",
                         ValidAudience = "Your_Audience",
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("Your_Secret_Key_Here")),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("aVeryLongSecretKeyThatIsAtLeast32BytesLong")),
                         ClockSkew = TimeSpan.Zero
                     };
                 });
@@ -58,6 +57,8 @@ namespace CompressAPI
             builder.Services.AddGrpc();
 
             var app = builder.Build();
+            app.UseHttpsRedirection();
+            app.UseCors("CorsPolicy");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -65,16 +66,14 @@ namespace CompressAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            app.UseCors("CorsPolicy");
+            app.UseWebSockets();
 
             app.MapGrpcService<DetectionGrpcService>();
 
-            app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseWebSockets();
 
             app.MapControllers();
 

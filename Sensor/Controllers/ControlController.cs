@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sensor.Services;
 
@@ -7,7 +6,7 @@ namespace SensorApp.Controllers
 {
     [ApiController]
     [Authorize]
-    [Route("api")]
+    [Route("api/[controller]")]
     public class ControlController : ControllerBase
     {
         private readonly WebSocketClient _webSocketClient;
@@ -18,15 +17,10 @@ namespace SensorApp.Controllers
         }
 
         [HttpPost("start")]
-        public async Task<IActionResult> StartStreaming()
+        public async Task<IActionResult> StartStreaming([FromBody] string uri)
         {
-
-            var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
-            var clientPort = HttpContext.Connection.RemotePort;
-
             // Log or use the client host information
-            Console.WriteLine($"StopStreaming called by {clientIp}:{clientPort}");
-            var serverUri = new Uri($"http://{clientIp}:{clientPort}");
+            var serverUri = new Uri(uri);
             await _webSocketClient.ConnectAsync(serverUri);
             return Ok("Started streaming.");
         }

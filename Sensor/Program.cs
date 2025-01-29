@@ -25,7 +25,7 @@ namespace CompressionApp.Client
             var videoCaptureService = host.Services.GetRequiredService<VideoCaptureService>();
             var transmissionService = host.Services.GetRequiredService<TransmissionService>();
             var analyzerService = host.Services.GetRequiredService<OpenCVAnalyzerService>();
-            var webSocketClient = new WebSocketClient(new Uri("ws://localhost:5039/ws/client"), new Uri("http://localhost:5039/api/health"));
+            var webSocketClient = host.Services.GetRequiredService<WebSocketClient>();
 
              //webSocketClient.ConnectAsync();
             Task.Run(BackgroundFrameProcessor);
@@ -44,7 +44,7 @@ namespace CompressionApp.Client
                 Cv2.ImShow("Sensor Video Stream", e.Frame);
                 Cv2.WaitKey(1);
 
-                e.Frame.Dispose();
+                //e.Frame.Dispose();
             };
             
             videoCaptureService.Start();

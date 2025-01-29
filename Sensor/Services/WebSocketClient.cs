@@ -1,45 +1,32 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.WebSockets;
-using System.Reflection.Metadata;
+﻿using System.Net.WebSockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using OpenCvSharp;
 
 namespace Sensor.Services
 {
     public class WebSocketClient
     {
-        private readonly HttpClient httpClient = new HttpClient();
         private readonly ClientWebSocket _clientWebSocket;
-        private readonly Uri _serverUri;
-        private readonly Uri _clientHealthUri;
         private bool _isStreaming;
         private bool _isConnected;
-        private static object syncObject = new();
 
 
-        public WebSocketClient(Uri serverUri, Uri healthUri)
+        public WebSocketClient()
         {
             _clientWebSocket = new ClientWebSocket();
-            _serverUri = serverUri;
-            _clientHealthUri = healthUri;
             _isStreaming = false;
             _isConnected = false;
-
         }
 
         public async Task ConnectAsync(Uri serverUri)
         {
             if (!_isConnected)
             {
-                await _clientWebSocket.ConnectAsync(serverUri, CancellationToken.None);
                 _isConnected = true;
                 _isStreaming = true;
+                await _clientWebSocket.ConnectAsync(serverUri, CancellationToken.None);
                 Console.WriteLine("Connected to WebSocket server.");
-                await ReceiveMessagesAsync();
+                //await ReceiveMessagesAsync();
             }
         }
 

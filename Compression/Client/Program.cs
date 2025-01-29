@@ -28,6 +28,7 @@ namespace Client
             builder.Services.AddSingleton<WebSocketHandler>();
 
             var app = builder.Build();
+            app.UseWebSockets();
 
             app.UseCors("CorsPolicy");
 
@@ -35,7 +36,6 @@ namespace Client
 
             app.UseRouting();
 
-            app.UseWebSockets();
 
             app.UseEndpoints(endpoints =>
             {

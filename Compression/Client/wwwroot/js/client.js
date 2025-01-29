@@ -36,11 +36,22 @@
         try {
             const token = await getJwtToken();
 
-            const response = await fetch('http://localhost:5039/api/websocket/start', { method: 'POST', credentials: 'include' });
-            if (!response.ok) throw new Error('Failed to start streaming');
-            console.log(await response.text());
+            const clientAddress = "ws://localhost:5039/ws/client"
 
-            socket = new WebSocket(`ws://localhost:5039/ws/client?access_token=${token}`);
+            const response = await fetch('http://localhost:5000/api/control/start', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(clientAddress)
+            });
+
+            if (!response.ok) throw new Error('Failed to start streaming');
+            console.log(await response.text())
+
+            socket = new WebSocket(`ws://localhost:5000`);
             socket.binaryType = "arraybuffer";
 
             socket.onopen = function () {

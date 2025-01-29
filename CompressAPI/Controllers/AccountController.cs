@@ -15,7 +15,7 @@ namespace SensorApi.Controllers
         {
             if (username == DemoUsername && password == DemoPassword)
             {
-                var token = TokenService.GenerateJwtToken(username, "Your_Issuer", "Your_Audience");
+                var token = TokenService.GenerateJwtToken(username, "aVeryLongSecretKeyThatIsAtLeast32BytesLong", "Your_Issuer", "Your_Audience");
                 return Ok(new { token = token });
             }
 
