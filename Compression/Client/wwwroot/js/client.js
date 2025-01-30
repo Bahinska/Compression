@@ -51,7 +51,7 @@
             if (!response.ok) throw new Error('Failed to start streaming');
             console.log(await response.text())
 
-            socket = new WebSocket(`ws://localhost:5000`);
+            socket = new WebSocket(clientAddress);
             socket.binaryType = "arraybuffer";
 
             socket.onopen = function () {

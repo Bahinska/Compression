@@ -49,7 +49,6 @@ namespace CompressionApp.Client
             
             videoCaptureService.Start();
             host.Start();
-            OpenBrowser("http://localhost:5000/api/status");
 
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
@@ -58,22 +57,6 @@ namespace CompressionApp.Client
             await host.WaitForShutdownAsync();
             await webSocketClient.DisconnectAsync();
             Cv2.DestroyAllWindows();
-        }
-        static void OpenBrowser(string url)
-        {
-            try
-            {
-                var psi = new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = url,
-                    UseShellExecute = true
-                };
-                System.Diagnostics.Process.Start(psi);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Could not open browser: {e.Message}");
-            }
         }
 
         static async Task BackgroundFrameProcessor()

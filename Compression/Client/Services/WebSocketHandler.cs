@@ -1,12 +1,13 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.WebSockets;
 using System.Text;
 
 public class WebSocketHandler
 {
-    private readonly ConcurrentDictionary<string, WebSocket> _connections = new ConcurrentDictionary<string, WebSocket>();
+    private readonly ConcurrentDictionary<WebSocket, WebSocket> _connections = new ConcurrentDictionary<WebSocket, WebSocket>();
     private const string clientSocket = "clientSocket";
 
     public async Task Handle(HttpContext context)
@@ -14,14 +15,19 @@ public class WebSocketHandler
         if (context.WebSockets.IsWebSocketRequest)
         {
             WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
-            _connections.TryAdd(clientSocket, webSocket);
+            _connections.TryAdd(webSocket, webSocket);
 
             await Receive(webSocket, async (result, buffer) =>
             {
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    _connections.TryRemove(clientSocket, out _);
+                    _connections.TryRemove(webSocket, out _);
                     await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+                }
+
+                if (result.MessageType == WebSocketMessageType.Binary)
+                {
+                    await Broadcast(buffer);
                 }
             });
         }
@@ -38,9 +44,7 @@ public class WebSocketHandler
         while (socket.State == WebSocketState.Open)
         {
             var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            //await socket.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length), WebSocketMessageType.Binary, true, CancellationToken.None);
             messageHandler(result, buffer);
-            //await Broadcast(buffer);
         }
     }
 

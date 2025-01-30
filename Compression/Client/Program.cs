@@ -11,7 +11,7 @@ namespace Client
             {
                 options.AddPolicy("CorsPolicy",
                     builder => builder
-                        .WithOrigins("http://localhost:5039")
+                        .WithOrigins("http://localhost:5000")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials());
