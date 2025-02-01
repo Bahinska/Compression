@@ -16,7 +16,7 @@ namespace CompressAPI
             {
                 options.AddPolicy("CorsPolicy",
                     policy => policy
-                        .WithOrigins("http://localhost:5039")
+                        .WithOrigins("https://localhost:4200")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials());

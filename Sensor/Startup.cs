@@ -27,7 +27,7 @@ namespace SensorConsoleApp
                 options.AddPolicy("AllowSpecificOrigin",
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:5039") // Allow frontend
+                        policy.WithOrigins("https://localhost:4200") // Allow frontend
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials(); // Important for cookies and authentication

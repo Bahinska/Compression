@@ -3,15 +3,17 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
+import { VideoStreamComponent } from './components/video-stream.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    VideoStreamComponent
   ],
   imports: [
     BrowserModule, HttpClientModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [VideoStreamComponent]
 })
 export class AppModule { }

@@ -88,7 +88,14 @@ namespace CompressionApp.Client
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>()
+                        .UseKestrel(options =>
+                        {
+                            options.ListenAnyIP(5001, listenOptions =>
+                            {
+                                listenOptions.UseHttps();
+                            });
+                        }); ;
                 });
     }
 }

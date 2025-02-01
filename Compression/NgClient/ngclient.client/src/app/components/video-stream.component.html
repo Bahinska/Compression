@@ -1,0 +1,6 @@
+<div>
+  <button (click)="startStream()">Start</button>
+  <button (click)="stopStream()">Stop</button>
+  <canvas #videoCanvas></canvas>
+  <img *ngIf="image$ | async as imgSrc" [src]="imgSrc" (load)="updateCanvas($event)">
+</div>
