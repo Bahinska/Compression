@@ -46,6 +46,7 @@ namespace CompressAPI
                 });
 
             builder.Services.AddSingleton<DCTDecompressionService>();
+            builder.Services.AddSingleton<WebSocketHandler>();
             builder.Services.AddWebSockets(options =>
             {
                 options.KeepAliveInterval = TimeSpan.FromSeconds(120);

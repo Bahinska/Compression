@@ -9,3 +9,13 @@
     <img *ngIf="image$ | async as imgSrc" [src]="imgSrc" class="video-img">
   </div>
 </div>
+
+<h2 class="image-counter">
+  Motion detected: <span class="image-count">{{ receivedImages.length }}</span>
+</h2>
+
+<div class="image-gallery">
+  <div *ngFor="let imageUrl of receivedImages" class="image-row">
+    <img [src]="imageUrl" alt="Received Image">
+  </div>
+</div>

@@ -25,7 +25,6 @@ namespace Sensor.Services
                 _isConnected = true;
                 _isStreaming = true;
                 await _clientWebSocket.ConnectAsync(serverUri, CancellationToken.None);
-                Thread.Sleep(100);
                 Console.WriteLine("Connected to WebSocket server.");
                 //await ReceiveMessagesAsync();
             }

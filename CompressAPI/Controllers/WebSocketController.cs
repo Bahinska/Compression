@@ -16,7 +16,7 @@ namespace SensorApi.Controllers
             _webSocketHandler = webSocketHandler;
         }
 
-        [HttpGet("/ws/client")]
+        [HttpGet("/ws/server")]
         public async Task GetClient()
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)
@@ -40,20 +40,6 @@ namespace SensorApi.Controllers
             {
                 HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             }
-        }
-
-        [HttpPost("start")]
-        public async Task<IActionResult> StartStreaming()
-        {
-            await _webSocketHandler.StartStreaming();
-            return Ok("Streaming started.");
-        }
-
-        [HttpPost("stop")]
-        public async Task<IActionResult> StopStreaming()
-        {
-            await _webSocketHandler.StopStreaming();
-            return Ok("Streaming stopped.");
         }
     }
 }

@@ -1,14 +1,28 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class WebSocketService {
-  private socket!: WebSocket;
+  private videoSocket!: WebSocket;
+  private photoSocket!: WebSocket;
   private imageSubject = new BehaviorSubject<string | null>(null);
+  public photoSubject = new Subject<Blob>();
   image$ = this.imageSubject.asObservable();
+  serverAddress = "wss://localhost:7246/ws/server";
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.startPhotoSocket();
+  }
+
+  startPhotoSocket() {
+    this.photoSocket = new WebSocket(this.serverAddress);
+
+    this.photoSocket.onmessage = (event) => {
+          const blob = new Blob([event.data], { type: 'image/png' });
+          this.photoSubject.next(blob);
+    };
+  }
 
   async getJwtToken(): Promise<string> {
     const storedToken = localStorage.getItem('jwtToken');
@@ -31,11 +45,12 @@ export class WebSocketService {
   }
 
   async startStream() {
+    this.photoSocket.close();
     const token = await this.getJwtToken();
     const clientAddress = "wss://localhost:4201/ws/client";
 
-    this.socket = new WebSocket(clientAddress);
-    this.socket.binaryType = "arraybuffer";
+    this.videoSocket = new WebSocket(clientAddress);
+    this.videoSocket.binaryType = "arraybuffer";
     
     const headers = { 
         'Authorization': `Bearer ${token}`, 
@@ -50,7 +65,7 @@ export class WebSocketService {
     ).toPromise();
     
     
-    this.socket.onmessage = (event) => {
+    this.videoSocket.onmessage = (event) => {
       if (event.data instanceof ArrayBuffer) {
         const imageData = new Uint8Array(event.data);
         const blob = new Blob([imageData], { type: 'image/png' });
@@ -59,14 +74,15 @@ export class WebSocketService {
       }
     };
     
-    this.socket.onclose = () => {
+    this.videoSocket.onclose = () => {
       this.imageSubject.next(null);
     };
   }
 
   async stopStream() {
-    if (this.socket) {
-      this.socket.close();
+    if (this.videoSocket) {
+      this.videoSocket.close();
     }
+    this.startPhotoSocket();
   }
 }

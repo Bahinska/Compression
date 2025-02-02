@@ -5,10 +5,12 @@ using ServerAPI.Services;
 public class DetectionGrpcService : DetectionService.DetectionServiceBase
 {
     private readonly IWebHostEnvironment _environment;
+    private readonly WebSocketHandler _webSocketHandler;
 
-    public DetectionGrpcService(IWebHostEnvironment environment)
+    public DetectionGrpcService(IWebHostEnvironment environment, WebSocketHandler webSocketHandler)
     {
         _environment = environment;
+        _webSocketHandler = webSocketHandler;
     }
 
     public override async Task<DetectionResponse> SendDetectedObject(DetectionRequest request, ServerCallContext context)
@@ -24,6 +26,8 @@ public class DetectionGrpcService : DetectionService.DetectionServiceBase
         var compressedFrame = request.Frame.ToByteArray();
         var decompressedMat = DCTDecompressionService.Decompress(compressedFrame, rows, cols);
         decompressedMat.SaveImage(decompressedPath);
+
+        await _webSocketHandler.NotifyClientsAsync(decompressedMat.ToBytes());
 
         return new DetectionResponse
         {

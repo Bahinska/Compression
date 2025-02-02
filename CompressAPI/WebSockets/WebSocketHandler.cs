@@ -4,6 +4,7 @@ using System.Net.WebSockets;
 using System.Collections.Concurrent;
 using System.Text;
 using System.Net.Http;
+using System.Text.Json;
 
 public class WebSocketHandler
 {
@@ -61,29 +62,13 @@ public class WebSocketHandler
         }
     }
 
-    public async Task StartStreaming()
+    public async Task NotifyClientsAsync(byte[] imageBytes)
     {
-        var response = await _httpClient.PostAsync("http://sensor-address/api/control/start", null);
-        if (response.IsSuccessStatusCode)
-        {
-            Console.WriteLine("Started streaming on sensor.");
-        }
-        else
-        {
-            Console.WriteLine("Failed to start streaming on sensor.");
-        }
-    }
+        var buffer = new ArraySegment<byte>(imageBytes);
 
-    public async Task StopStreaming()
-    {
-        var response = await _httpClient.PostAsync("http://sensor-address/api/control/stop", null);
-        if (response.IsSuccessStatusCode)
+        foreach (var connection in _connections.Where(c => c.Value.State == WebSocketState.Open))
         {
-            Console.WriteLine("Stopped streaming on sensor.");
-        }
-        else
-        {
-            Console.WriteLine("Failed to stop streaming on sensor.");
+            await connection.Value.SendAsync(buffer, WebSocketMessageType.Binary, true, CancellationToken.None);
         }
     }
 }
