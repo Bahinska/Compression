@@ -1,6 +1,11 @@
-<div>
-  <button (click)="startStream()">Start</button>
-  <button (click)="stopStream()">Stop</button>
-  <canvas #videoCanvas></canvas>
-  <img *ngIf="image$ | async as imgSrc" [src]="imgSrc" (load)="updateCanvas($event)">
+<div class="container">
+  <h2>Live Video Stream</h2>
+  <div class="button-group">
+    <button (click)="startStream()" class="start-btn">Start Stream</button>
+    <button (click)="stopStream()" class="stop-btn">Stop Stream</button>
+  </div>
+
+  <div class="video-wrapper">
+    <img *ngIf="image$ | async as imgSrc" [src]="imgSrc" class="video-img">
+  </div>
 </div>

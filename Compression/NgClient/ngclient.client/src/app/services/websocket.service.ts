@@ -64,10 +64,9 @@ export class WebSocketService {
     };
   }
 
-  stopStream() {
+  async stopStream() {
     if (this.socket) {
       this.socket.close();
     }
-    return this.http.post('https://localhost:4201/api/websocket/stop', {}).toPromise();
   }
 }
