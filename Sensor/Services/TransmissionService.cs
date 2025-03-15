@@ -15,7 +15,8 @@ namespace Sensor.Services
         }
         public async Task SendDetectedObjectAsync(Mat frame, string detectedObject)
         {
-            var compressedFrame = DCTCompressionService.Compress(frame);
+            //var compressedFrame = DCTCompressionService.Compress(frame);
+            var compressedFrame = WaveletCompressionService.Compress(frame);
 
             var request = new DetectionRequest
             {

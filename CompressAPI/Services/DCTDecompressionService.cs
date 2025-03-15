@@ -1,4 +1,6 @@
 ﻿using OpenCvSharp;
+using System;
+using System.Diagnostics;
 
 namespace ServerAPI.Services
 {
@@ -13,8 +15,15 @@ namespace ServerAPI.Services
             {
                 var matrix = ByteArrayToMatrix(compressedFrame, rows, cols);
 
+                // Засікання часу перед початком декомпресування
+                var stopwatch = Stopwatch.StartNew();
+
                 // Apply Inverse 2D Discrete Cosine Transform (IDCT)
                 Accord.Math.CosineTransform.IDCT(matrix);
+
+                // Зупинення таймера після завершення декомпресування
+                stopwatch.Stop();
+                Console.WriteLine($"Decompression took {stopwatch.ElapsedMilliseconds} ms");
 
                 return MatrixToMat(matrix);
             }

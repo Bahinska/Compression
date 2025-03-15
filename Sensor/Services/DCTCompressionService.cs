@@ -1,4 +1,6 @@
 ﻿using OpenCvSharp;
+using System;
+using System.Diagnostics;
 
 namespace Sensor.Services
 {
@@ -13,9 +15,15 @@ namespace Sensor.Services
             {
                 var matrix = MatToMatrix(frame);
 
-                // Apply 2D Discrete Cosine Transform (DCT)
+                // Засікання часу перед початком стиснення
+                var stopwatch = Stopwatch.StartNew();
+
+                // Perform 2D Discrete Cosine Transform (DCT)
                 Accord.Math.CosineTransform.DCT(matrix);
 
+                // Зупинення таймера після завершення стиснення
+                stopwatch.Stop();
+                Console.WriteLine($"Compression took {stopwatch.ElapsedMilliseconds} ms");
 
                 return MatrixToByteArray(matrix);
             }

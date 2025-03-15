@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Sensor.Services;
 using SensorApi.Protos;
 using ServerAPI.Services;
 
@@ -24,7 +25,9 @@ public class DetectionGrpcService : DetectionService.DetectionServiceBase
         Directory.CreateDirectory(Path.GetDirectoryName(decompressedPath));
 
         var compressedFrame = request.Frame.ToByteArray();
-        var decompressedMat = DCTDecompressionService.Decompress(compressedFrame, rows, cols);
+        //var decompressedMat = DCTDecompressionService.Decompress(compressedFrame, rows, cols);
+        var decompressedMat = WaveletCompressionService.Decompress(compressedFrame, rows, cols);
+
         decompressedMat.SaveImage(decompressedPath);
 
         await _webSocketHandler.NotifyClientsAsync(decompressedMat.ToBytes());
