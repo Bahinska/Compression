@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { WebSocketService } from "../services/websocket.service";
+import { WebSocketService } from "src/app/services/websocket.service";
 
 @Component({
     selector: "app-video-stream",
