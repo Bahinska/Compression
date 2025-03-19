@@ -9,6 +9,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material.module';
+import { AuthService } from './services/auth-service.service';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,7 @@ import { MaterialModule } from './material.module';
     BrowserAnimationsModule,
     MaterialModule 
   ],
-  providers: [],
+  providers: [AuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

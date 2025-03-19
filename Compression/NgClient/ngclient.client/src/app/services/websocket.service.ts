@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Subject } from 'rxjs';
+import { AuthService } from './auth-service.service';
 
 @Injectable({ providedIn: 'root' })
 export class WebSocketService {
@@ -11,7 +12,8 @@ export class WebSocketService {
   image$ = this.imageSubject.asObservable();
   serverAddress = "wss://localhost:7246/ws/server";
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient
+  ) {
     this.startPhotoSocket();
   }
 
@@ -24,29 +26,10 @@ export class WebSocketService {
     };
   }
 
-  async getJwtToken(): Promise<string> {
-    const storedToken = localStorage.getItem('jwtToken');
-    if (storedToken) return storedToken;
-  
-    const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
-  
-    const body = new HttpParams()
-      .set('username', 'test')
-      .set('password', 'password'); 
-  
-    try {
-      const response: any = await this.http.post('https://localhost:7246/api/account/token', body, { headers }).toPromise();
-      localStorage.setItem('jwtToken', response.token);
-      return response.token;
-    } catch (error) {
-      console.error("JWT Token Fetch Error:", error);
-      throw error;
-    }
-  }
-
   async startStream() {
     this.photoSocket.close();
-    const token = await this.getJwtToken();
+    const token = localStorage.getItem('jwtToken');
+
     const clientAddress = "wss://localhost:4201/ws/client";
 
     this.videoSocket = new WebSocket(clientAddress);
