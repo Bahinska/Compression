@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.IdentityModel.Tokens;
+using SensorApi.Services;
 using ServerAPI.Services;
 using System.Text;
+using ServerAPI.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace CompressAPI
 {
@@ -21,6 +25,12 @@ namespace CompressAPI
                         .AllowAnyHeader()
                         .AllowCredentials());
             });
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
             builder.Services.AddControllers();
 
@@ -47,6 +57,8 @@ namespace CompressAPI
 
             builder.Services.AddSingleton<DCTDecompressionService>();
             builder.Services.AddSingleton<WebSocketHandler>();
+            builder.Services.AddScoped<UserService>();
+
             builder.Services.AddWebSockets(options =>
             {
                 options.KeepAliveInterval = TimeSpan.FromSeconds(120);
