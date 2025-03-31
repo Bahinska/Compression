@@ -22,10 +22,10 @@ namespace Sensor.Services
         {
             if (!_isConnected)
             {
-                _isConnected = true;
-                _isStreaming = true;
                 await _clientWebSocket.ConnectAsync(serverUri, CancellationToken.None);
                 Console.WriteLine("Connected to WebSocket server.");
+                _isConnected = true;
+                _isStreaming = true;
                 //await ReceiveMessagesAsync();
             }
         }

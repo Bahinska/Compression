@@ -24,11 +24,11 @@ export class LoginComponent {
 
     // Redirect to stream if already logged in
     if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/stream']);
+      this.router.navigate(['/selection']);
     }
   }
 
-  get f() { return this.loginForm.controls; }
+  get f() { return this.loginForm.controls; } 
 
   onSubmit() {
     this.submitted = true;
@@ -39,7 +39,7 @@ export class LoginComponent {
     try {
       this.authService.getJwtToken(this.loginForm.value.username, this.loginForm.value.password).then((token)=>{
         localStorage.setItem('jwtToken', token);
-        this.router.navigate(['/stream']);
+        this.router.navigate(['/selection']);
       });
     } catch(error: any) {
       console.error("Login failed", error);
