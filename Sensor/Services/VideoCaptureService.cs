@@ -16,6 +16,7 @@ namespace Sensor.Services
                 throw new Exception("Cannot open the camera");
 
             _frameRate = frameRate;
+            Console.WriteLine(_videoCapture.Guid);
         }
 
         public void Start()
@@ -26,6 +27,8 @@ namespace Sensor.Services
                 {
                     Mat frame = new Mat();
                     _videoCapture.Read(frame);
+
+                    
                     if (!frame.Empty())
                     {
                         OnNewFrame?.Invoke(this, new FrameEventArgs { Frame = frame });

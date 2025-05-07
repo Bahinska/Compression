@@ -52,7 +52,7 @@ export class AuthService {
   
     try {
       const response: any = await this.http.post('https://localhost:7246/api/account/token', body, { headers }).toPromise();
-      localStorage.setItem('jwtToken', response.token);
+      //localStorage.setItem('jwtToken', response.token);
       return response.token;
     } catch (error) {
       console.error("JWT Token Fetch Error:", error);

@@ -11,6 +11,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material.module';
 import { AuthService } from './services/auth-service.service';
 import { SelectionComponent } from './components/selection/selection.component';
+import { RegistrationComponent } from './components/registration/registration.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { SelectionComponent } from './components/selection/selection.component';
     VideoStreamComponent,
     LoginComponent,
     SelectionComponent,
+    RegistrationComponent
   ],
   imports: [
     BrowserModule,

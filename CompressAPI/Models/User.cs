@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ServerAPI.Models
 {
     public class User
     {
         [Key]
-        public int Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
 
         [Required]
         [MaxLength(100)]
@@ -14,5 +16,7 @@ namespace ServerAPI.Models
         [Required]
         [MaxLength(100)]
         public string Password { get; set; }
+
+        public ICollection<Sensor> Sensors { get; set; }
     }
 }

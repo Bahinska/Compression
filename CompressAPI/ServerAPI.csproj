@@ -35,4 +35,8 @@
     <Protobuf Include="Protos\detection.proto" GrpcServices="Server" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

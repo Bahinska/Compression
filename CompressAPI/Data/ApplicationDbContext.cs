@@ -8,6 +8,8 @@ namespace ServerAPI.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
-    }
+
+        public DbSet<Models.Sensor> Sensors { get; set; }
+     }
 }
 
