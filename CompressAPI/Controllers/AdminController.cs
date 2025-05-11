@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SensorApi.Services;
 using ServerAPI.Models;
+using ServerAPI.Services;
 
 namespace ServerAPI.Controllers
 {
@@ -9,10 +10,12 @@ namespace ServerAPI.Controllers
     public class AdminController : ControllerBase
     {
         private readonly UserService _userService;
+        private readonly IEmailSenderExtended _emailSender;
 
-        public AdminController(UserService userService)
+        public AdminController(UserService userService, IEmailSenderExtended emailSender)
         {
             _userService = userService;
+            _emailSender = emailSender;
         }
 
         [HttpPost("register")]
@@ -60,6 +63,13 @@ namespace ServerAPI.Controllers
             }
 
             return NotFound();
+        }
+
+        [HttpGet("mail")]
+        public async Task<IActionResult> mail()
+        {
+            await _emailSender.SendEmailWithImageAsync("margoshacatmm11880@gmail.com", "Object detected",new byte[10]);
+            return Ok();
         }
     }
 }

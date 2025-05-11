@@ -7,6 +7,7 @@
     <InvariantGlobalization>false</InvariantGlobalization>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\Compression</DockerfileContext>
+    <UserSecretsId>ce85930e-5fe5-4d19-8b7c-abc53960edc2</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

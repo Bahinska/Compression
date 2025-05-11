@@ -7,11 +7,13 @@ public class DetectionGrpcService : DetectionService.DetectionServiceBase
 {
     private readonly IWebHostEnvironment _environment;
     private readonly WebSocketHandler _webSocketHandler;
+    private readonly IEmailSenderExtended _emailSender;
 
-    public DetectionGrpcService(IWebHostEnvironment environment, WebSocketHandler webSocketHandler)
+    public DetectionGrpcService(IWebHostEnvironment environment, WebSocketHandler webSocketHandler, IEmailSenderExtended emailSender)
     {
         _environment = environment;
         _webSocketHandler = webSocketHandler;
+        _emailSender = emailSender;
     }
 
     public override async Task<DetectionResponse> SendDetectedObject(DetectionRequest request, ServerCallContext context)
@@ -29,6 +31,8 @@ public class DetectionGrpcService : DetectionService.DetectionServiceBase
         var decompressedMat = WaveletCompressionService.Decompress(compressedFrame, rows, cols);
 
         decompressedMat.SaveImage(decompressedPath);
+
+        await _emailSender.SendEmailWithImageAsync("margoshacatmm11880@gmail.com", "Object detected", decompressedMat.ToBytes());
 
         await _webSocketHandler.NotifyClientsAsync(decompressedMat.ToBytes());
 

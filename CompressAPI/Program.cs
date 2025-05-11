@@ -8,6 +8,7 @@ using ServerAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using ServerAPI.Automapper;
+using ServerAPI.Models;
 
 namespace CompressAPI
 {
@@ -34,6 +35,7 @@ namespace CompressAPI
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
             builder.Services.AddControllers();
+            builder.Configuration.AddJsonFile("secrets.json", optional: true);
 
             builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 
@@ -57,10 +59,11 @@ namespace CompressAPI
                         ClockSkew = TimeSpan.Zero
                     };
                 });
-
             builder.Services.AddSingleton<DCTDecompressionService>();
             builder.Services.AddSingleton<WebSocketHandler>();
             builder.Services.AddScoped<UserService>();
+            builder.Services.AddTransient<IEmailSenderExtended, EmailSender>();
+            builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
             builder.Services.AddWebSockets(options =>
             {

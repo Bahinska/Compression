@@ -1,4 +1,5 @@
-﻿using Grpc.Net.Client;
+﻿using Grpc.Core;
+using Grpc.Net.Client;
 using OpenCvSharp;
 using Sensor.Protos;
 
@@ -28,6 +29,10 @@ namespace Sensor.Services
             {
                 var response = await _grpcClient.SendDetectedObjectAsync(request);
                 Console.WriteLine(response.Message);
+            }
+            catch (RpcException rpcEx)
+            {
+                Console.WriteLine($"gRPC error: {rpcEx.Status.StatusCode} - {rpcEx.Status.Detail}");
             }
             catch (Exception ex)
             {
