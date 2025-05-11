@@ -1,0 +1,22 @@
+.full-width {
+    width: 100%;
+  }
+  
+  .sensor-field {
+    display: flex;
+    align-items: center;
+  }
+  
+  .sensor-field mat-form-field {
+    flex: 1;
+  }
+  
+  .sensor-field button {
+    margin-left: 8px;
+  }
+  
+  .add-sensor-button {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+  }

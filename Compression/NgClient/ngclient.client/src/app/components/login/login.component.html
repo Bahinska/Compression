@@ -1,21 +1,21 @@
 <mat-card class="login-card">
-    <mat-card-title>Login</mat-card-title>
+    <mat-card-title>Логін</mat-card-title>
     <mat-card-content>
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Username</mat-label>
+          <mat-label>Емейл</mat-label>
           <input matInput formControlName="username">
           <mat-error *ngIf="submitted && f['username'].errors">
-            <div *ngIf="f['username'].errors['required']">Username is required</div>
+            <div *ngIf="f['username'].errors['required']">Емейл обов'язковий</div>
           </mat-error>
         </mat-form-field>
         <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Password</mat-label>
+          <mat-label>Пароль</mat-label>
           <input matInput type="password" formControlName="password">
-          <mat-error *ngIf="submitted && f['password'].errors">Password is required</mat-error>
+          <mat-error *ngIf="submitted && f['password'].errors">Пароль обов'язковий</mat-error>
         </mat-form-field>
         <div class="button-container">
-          <button mat-raised-button color="primary" type="submit">Login</button>
+          <button mat-raised-button color="primary" type="submit">Увійти</button>
         </div>
       </form>
     </mat-card-content>

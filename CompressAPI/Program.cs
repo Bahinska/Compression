@@ -7,6 +7,7 @@ using System.Text;
 using ServerAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using ServerAPI.Automapper;
 
 namespace CompressAPI
 {
@@ -33,6 +34,8 @@ namespace CompressAPI
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
             builder.Services.AddControllers();
+
+            builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 
 
             builder.Services.AddAuthentication(options =>

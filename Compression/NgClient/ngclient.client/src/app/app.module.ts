@@ -1,5 +1,5 @@
 import { HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
@@ -12,6 +12,11 @@ import { MaterialModule } from './material.module';
 import { AuthService } from './services/auth-service.service';
 import { SelectionComponent } from './components/selection/selection.component';
 import { RegistrationComponent } from './components/registration/registration.component';
+import { UserListComponent } from './components/user-list/user-list.component';
+import { MatTableModule } from '@angular/material/table';
+import { EditUserDialogComponent } from './components/edit-user-dialog/edit-user-dialog.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import {MatIconModule} from '@angular/material/icon'
 
 @NgModule({
   declarations: [
@@ -19,7 +24,9 @@ import { RegistrationComponent } from './components/registration/registration.co
     VideoStreamComponent,
     LoginComponent,
     SelectionComponent,
-    RegistrationComponent
+    RegistrationComponent,
+    UserListComponent,
+    EditUserDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -27,9 +34,13 @@ import { RegistrationComponent } from './components/registration/registration.co
     AppRoutingModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
-    MaterialModule 
+    MaterialModule,
+    MatTableModule,
+    MatDialogModule,
+    MatIconModule
   ],
   providers: [AuthService],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppModule { }

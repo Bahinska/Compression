@@ -30,5 +30,36 @@ namespace ServerAPI.Controllers
 
             return Ok(new { message = "User registered successfully" });
         }
+
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var users = await Task.FromResult(_userService.GetAllUsers());
+            return Ok(users);
+        }
+
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            var result = await _userService.DeleteUserAsync(id);
+            if (result)
+            {
+                return NoContent();
+            }
+
+            return NotFound();
+        }
+
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserModel updatedUser)
+        {
+            var result = await _userService.UpdateUserAsync(id, updatedUser);
+            if (result)
+            {
+                return Ok(new { message = "User updated successfully" });
+            }
+
+            return NotFound();
+        }
     }
 }

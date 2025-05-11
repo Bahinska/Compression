@@ -1,0 +1,12 @@
+mat-card {
+    margin: 20px;
+    padding: 20px;
+  }
+  
+  table {
+    width: 100%;
+  }
+  
+  .mat-column-actions {
+    width: 150px;
+  }
