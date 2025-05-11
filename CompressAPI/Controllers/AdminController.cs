@@ -64,12 +64,5 @@ namespace ServerAPI.Controllers
 
             return NotFound();
         }
-
-        [HttpGet("mail")]
-        public async Task<IActionResult> mail()
-        {
-            await _emailSender.SendEmailWithImageAsync("margoshacatmm11880@gmail.com", "Object detected",new byte[10]);
-            return Ok();
-        }
     }
 }
