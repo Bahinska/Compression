@@ -1,0 +1,23 @@
+<div class="container">
+    <div class="date-pickers">
+      <mat-form-field appearance="fill">
+        <mat-label>Від</mat-label>
+        <input matInput [matDatepicker]="startPicker" [(ngModel)]="startDate">
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+  
+      <mat-form-field appearance="fill">
+        <mat-label>До</mat-label>
+        <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDate">
+        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+  
+    <button mat-raised-button color="primary" (click)="searchPhotos()">Пошук</button>
+  
+    <div class="photos">
+      <img *ngFor="let photo of photos" [src]="photo" alt="Photo">
+    </div>
+  </div>

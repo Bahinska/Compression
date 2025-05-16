@@ -1,7 +1,4 @@
-﻿using Amazon.S3;
-using Amazon.S3.Model;
-using Grpc.Core;
-using OpenCvSharp;
+﻿using Grpc.Core;
 using Sensor.Services;
 using SensorApi.Protos;
 using ServerAPI.Services;
@@ -11,16 +8,15 @@ public class DetectionGrpcService : DetectionService.DetectionServiceBase
     private readonly IWebHostEnvironment _environment;
     private readonly WebSocketHandler _webSocketHandler;
     private readonly IEmailSenderExtended _emailSender;
-    private readonly IAmazonS3 _s3Client;
-    private readonly string _bucketName = "detections-lnu";
+    private readonly S3Service _s3Service;
 
     public DetectionGrpcService(IWebHostEnvironment environment, WebSocketHandler webSocketHandler,
-        IEmailSenderExtended emailSender)
+        IEmailSenderExtended emailSender, S3Service s3Service)
     {
         _environment = environment;
         _webSocketHandler = webSocketHandler;
         _emailSender = emailSender;
-        _s3Client = new AmazonS3Client();
+        _s3Service = s3Service;
     }
 
     public override async Task<DetectionResponse> SendDetectedObject(DetectionRequest request, ServerCallContext context)
@@ -35,7 +31,7 @@ public class DetectionGrpcService : DetectionService.DetectionServiceBase
         var decompressedMat = WaveletCompressionService.Decompress(compressedFrame, rows, cols);
 
         // Upload the decompressed image to S3
-        await UploadImageToS3(decompressedMat, s3Key);
+        await _s3Service.UploadImageAsync(decompressedMat, s3Key);
 
         // Convert the decompressedMat to a byte array for email and websockets
         var decompressedBytes = decompressedMat.ToBytes();
@@ -47,41 +43,5 @@ public class DetectionGrpcService : DetectionService.DetectionServiceBase
         {
             Message = "Decompressed photo uploaded to S3 successfully."
         };
-    }
-
-    private async Task UploadImageToS3(Mat image, string s3Key)
-    {
-        using (var stream = new MemoryStream())
-        {
-            // Save the image to the memory stream as a PNG
-            image.WriteToStream(stream, ".png");
-
-            // Configure the uploaded stream position
-            stream.Position = 0;
-
-            var putRequest = new PutObjectRequest
-            {
-                BucketName = _bucketName,
-                Key = s3Key,
-                InputStream = stream,
-                ContentType = "image/png",
-            };
-
-            var response = await _s3Client.PutObjectAsync(putRequest);
-
-            if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
-            {
-                throw new Exception("Failed to upload file to S3");
-            }
-        }
-    }
-}
-
-public static class MatExtensions
-{
-    public static void WriteToStream(this Mat mat, Stream stream, string format)
-    {
-        Cv2.ImEncode(format, mat, out byte[] buf);
-        stream.Write(buf, 0, buf.Length);
     }
 }

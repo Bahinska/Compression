@@ -1,0 +1,23 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .date-pickers {
+    display: flex;
+    gap: 16px;
+  }
+  
+  .photos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  
+  .photos img {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: cover;
+  }

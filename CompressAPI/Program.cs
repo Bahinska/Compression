@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using ServerAPI.Automapper;
 using ServerAPI.Models;
+using Amazon.S3;
+using Amazon.Runtime;
+using Microsoft.Extensions.Configuration;
 
 namespace CompressAPI
 {
@@ -61,6 +64,7 @@ namespace CompressAPI
                 });
             builder.Services.AddSingleton<DCTDecompressionService>();
             builder.Services.AddSingleton<WebSocketHandler>();
+            builder.Services.AddSingleton<S3Service>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddTransient<IEmailSenderExtended, EmailSender>();
             builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
