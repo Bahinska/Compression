@@ -1,6 +1,9 @@
 <mat-card>
     <mat-card-title>User List</mat-card-title>
     <mat-card-content>
+      <button mat-icon-button (click)="addUser()">
+        <mat-icon>add</mat-icon>
+      </button>
       <table mat-table [dataSource]="users" class="mat-elevation-z8">
 
         <ng-container matColumnDef="username">

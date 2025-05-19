@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import { EditUserDialogComponent } from '../edit-user-dialog/edit-user-dialog.component';
 import { UserDomain } from 'src/app/models/userDomain.model';
+import { RegistrationComponent } from '../registration/registration.component';
 
 @Component({
   selector: 'app-user-list',
@@ -35,6 +36,17 @@ export class UserListComponent implements OnInit {
     const dialogRef = this.dialog.open(EditUserDialogComponent, {
       width: '500px',
       data: user
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadUsers();
+      }
+    });
+  }
+
+  addUser(): void {
+    const dialogRef = this.dialog.open(RegistrationComponent, {
     });
 
     dialogRef.afterClosed().subscribe(result => {
